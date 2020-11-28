@@ -1,38 +1,65 @@
 const express = require('express');
 const app = express();
-const port = 3000;//Loads the handlebars module
+const port = 1234;
 const handlebars = require('express-handlebars');
-//Sets our app to use the handlebars engine
 app.set('view engine', 'hbs');
-//Sets handlebars configurations (we will go through them later on)
-//instead of app.engine('handlebars', handlebars({
-app.engine('hbs', handlebars({
-layoutsDir: __dirname + '/views/layouts',
-//new configuration parameter
-extname: 'hbs'
-}));
+
+
 app.use(express.static('public'))
-app.get('/', (req, res) => {
-//Serves the body of the page aka "main.handlebars" to the container //aka "index.handlebars"
-res.render('main', {layout : 'index'});
-});
-app.listen(port, () => console.log(`App listening to port ${port}`));
+  
 
 app.engine('hbs', handlebars({
-layoutsDir: __dirname + '/views/layouts',
-extname: 'hbs',
-defaultLayout: 'planB',
-//new configuration parameter
-partialsDir: __dirname + '/views/partials/'
-}));
-app.get('/', (req, res) => {
-//Using the index.hbs file instead of planB
-res.render('main', {layout: 'index'});});
+    layoutsDir: __dirname + '/views/layouts',
+    extname: 'hbs',
+    defaultLayout: 'planB',
+    partialsDir: __dirname + '/views/partials/'
+    }));
+    
+    
+
+fakeApi = () => {
+    return [
+      {
+        name: 'Katarina',
+        lane: 'midlaner'
+      },
+      {
+        name: 'Jayce',
+        lane: 'toplaner'
+      },
+      {
+        name: 'Heimerdinger',
+        lane: 'toplaner'
+      },
+      {
+        name: 'Zed',
+        lane: 'midlaner'
+      },
+      {
+        name: 'Azir',
+        lane: 'midlaner'
+      }
+    ];
+  }
+
+  app.get('/', (req, res) => {
+  res.render('main', {layout: 'index', suggestedChamps: fakeApi(), listExists: true});
+  });
 
 
-//I would like to use a real api but let's use this for the sake of //the simplicity of the article
- const fakeApi = () => 'Faker';
+app.get("/saluta", (req, res) => {
+  const query = req.query
+  const headers = req.headers
+  const messaggioSaluto = "Ciao " + query.name + ", " + query.cognome  + ". <br/> Hai " + query.anni + "anni"
+  res.send(messaggioSaluto)
+})
 
-app.get('/', (req, res) => {
-res.render('main', {layout: 'index', proPlayer: fakeApi()});
-});
+app.get("/informazioni", (req, res) => {
+  const headers = req.headers
+  const informazioni = "Il tuo user agent è: " + headers["user-agent"]
+  const ip = "Il tuo ip è:" + req.headers['x-forwarded-for']
+  res.send(informazioni + "<br/>" + ip)
+})
+
+
+app.listen(port, () => console.log(`App listening to port ${port}`));
